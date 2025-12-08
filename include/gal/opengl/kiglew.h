@@ -31,7 +31,30 @@
 // Pull in the configuration options for wxWidgets
 #include <wx/platform.h>
 
-#if defined( __unix__ ) and not defined( __APPLE__ )
+#if defined( __EMSCRIPTEN__ )
+    // WebGL: Emscripten provides OpenGL ES headers, no GLEW needed
+    #include <GLES2/gl2.h>
+    #include <GLES2/gl2ext.h>
+
+    // GLEW compatibility stubs for WebGL
+    #define GLEW_OK 0
+    #define GLEW_VERSION 1
+    #define GLEW_VERSION_2_0 1
+    #define GLEW_ARB_vertex_array_object 1
+    #define GLEW_ARB_framebuffer_object 1
+    #define GLEW_EXT_framebuffer_object 1
+    #define GLEW_ARB_texture_non_power_of_two 1
+    inline int glewInit() { return GLEW_OK; }
+    inline const unsigned char* glewGetString(int) { return (const unsigned char*)"WebGL"; }
+    inline const char* glewGetErrorString(int) { return ""; }
+    inline int glewIsSupported(const char*) { return 1; }
+
+    // VAO functions - available in WebGL2 / OpenGL ES 3.0
+    #ifndef GL_VERTEX_ARRAY_BINDING
+    #define GL_VERTEX_ARRAY_BINDING 0x85B5
+    #endif
+
+#elif defined( __unix__ ) and not defined( __APPLE__ )
 
     #ifdef KICAD_USE_EGL
 

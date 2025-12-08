@@ -61,7 +61,9 @@
 #include <panel_3D_opengl_options.h>
 #include <panel_3D_raytracing_options.h>
 #include <project_pcb.h>
+#ifdef KICAD_SCRIPTING
 #include <python_scripting.h>
+#endif
 #include <thread_pool.h>
 
 #include "invoke_pcb_dialog.h"
@@ -77,7 +79,9 @@
 
 /* init functions defined by swig */
 
+#ifdef KICAD_SCRIPTING
 extern "C" PyObject* PyInit__pcbnew( void );
+#endif
 
 namespace PCB {
 
@@ -104,8 +108,10 @@ static struct IFACE : public KIFACE_BASE, public UNITS_PROVIDER
         {
             auto frame = new PCB_EDIT_FRAME( aKiway, aParent );
 
+#ifdef KICAD_SCRIPTING
             // give the scripting helpers access to our frame
             ScriptingSetPcbEditFrame( frame );
+#endif
 
             if( Kiface().IsSingle() )
             {
@@ -371,8 +377,10 @@ static struct IFACE : public KIFACE_BASE, public UNITS_PROVIDER
             // TODO this is kind of cursed and needs thought to support multi-project
             return PROJECT_PCB::FootprintLibAdapter( &Pgm().GetSettingsManager().Prj() );
 
+#ifdef KICAD_SCRIPTING
         case KIFACE_SCRIPTING_LEGACY:
             return reinterpret_cast<void*>( PyInit__pcbnew );
+#endif
 
         default:
             return nullptr;

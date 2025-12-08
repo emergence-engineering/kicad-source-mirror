@@ -85,10 +85,14 @@ PCB_BASE_FRAME::PCB_BASE_FRAME( KIWAY* aKiway, wxWindow* aParent, FRAME_T aFrame
                                 long aStyle, const wxString& aFrameName ) :
         EDA_DRAW_FRAME( aKiway, aParent, aFrameType, aTitle, aPos, aSize, aStyle, aFrameName, pcbIUScale ),
         m_pcb( nullptr ),
-        m_originTransforms( *this ),
-        m_inFpChangeTimerEvent( false )
+        m_originTransforms( *this )
+#if wxUSE_FSWATCHER
+        , m_inFpChangeTimerEvent( false )
+#endif
 {
+#if wxUSE_FSWATCHER
     m_watcherDebounceTimer.Bind( wxEVT_TIMER, &PCB_BASE_FRAME::OnFpChangeDebounceTimer, this );
+#endif
 }
 
 
@@ -1074,6 +1078,7 @@ void PCB_BASE_FRAME::SetDisplayOptions( const PCB_DISPLAY_OPTIONS& aOptions, boo
 }
 
 
+#if wxUSE_FSWATCHER
 void PCB_BASE_FRAME::setFPWatcher( FOOTPRINT* aFootprint )
 {
     wxLogTrace( traceLibWatch, "setFPWatcher" );
@@ -1239,3 +1244,4 @@ void PCB_BASE_FRAME::OnFpChangeDebounceTimer( wxTimerEvent& aEvent )
 
     m_inFpChangeTimerEvent = false;
 }
+#endif // wxUSE_FSWATCHER

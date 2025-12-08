@@ -38,6 +38,12 @@ elseif( KICAD_WX_PORT STREQUAL gtk )
         message( STATUS "Configuring KiCad not to hide any GTK error messages" )
         string( APPEND PLATFORM_COMPILE_DEFS "-DKICAD_SHOW_GTK_MESSAGES" )
     endif()
+elseif( KICAD_WX_PORT STREQUAL wasm )
+    # WASM port - uses stub implementations from wasm layer
+    set( PLATFORM_SRCS
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/ui.cpp
+        )
+    message( STATUS "Using WASM kiplatform stub implementation" )
 endif()
 
 
@@ -80,6 +86,19 @@ elseif( WIN32 )
         "imm32"
         "windowsapp"
         )
+elseif( EMSCRIPTEN )
+    # WebAssembly / Emscripten - use stub implementations
+    list( APPEND PLATFORM_SRCS
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/app.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/drivers.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/environment.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/io.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/policy.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/secrets.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/sysinfo.cpp
+        ${PROJECT_SOURCE_DIR}/../wasm/kiplatform/printing.cpp
+        )
+    message( STATUS "Using WASM kiplatform OS stubs" )
 elseif( UNIX )
     list( APPEND PLATFORM_SRCS
         os/unix/app.cpp

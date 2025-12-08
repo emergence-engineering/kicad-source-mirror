@@ -42,9 +42,11 @@
 #include <settings/color_settings.h>
 #include <settings/settings_manager.h>
 #include <trigo.h>
+#ifdef KICAD_IPC_API
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/board/board_types.pb.h>
+#endif
 
 
 static const int INWARD_ARROW_LENGTH_TO_HEAD_RATIO = 2;
@@ -270,6 +272,7 @@ double PCB_DIMENSION_BASE::Similarity( const BOARD_ITEM& aOther ) const
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIMENSION_BASE::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -349,6 +352,7 @@ bool PCB_DIMENSION_BASE::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 void PCB_DIMENSION_BASE::drawAnArrow( VECTOR2I startPoint, EDA_ANGLE anAngle, int aLength )
@@ -858,6 +862,7 @@ EDA_ITEM* PCB_DIM_ALIGNED::Clone() const
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIM_ALIGNED::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -897,6 +902,7 @@ bool PCB_DIM_ALIGNED::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 void PCB_DIM_ALIGNED::swapData( BOARD_ITEM* aImage )
@@ -1085,6 +1091,7 @@ EDA_ITEM* PCB_DIM_ORTHOGONAL::Clone() const
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIM_ORTHOGONAL::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -1130,6 +1137,7 @@ bool PCB_DIM_ORTHOGONAL::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 void PCB_DIM_ORTHOGONAL::swapData( BOARD_ITEM* aImage )
@@ -1350,6 +1358,7 @@ PCB_DIM_LEADER::PCB_DIM_LEADER( BOARD_ITEM* aParent ) :
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIM_LEADER::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -1389,6 +1398,7 @@ bool PCB_DIM_LEADER::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 EDA_ITEM* PCB_DIM_LEADER::Clone() const
@@ -1539,6 +1549,7 @@ PCB_DIM_RADIAL::PCB_DIM_RADIAL( BOARD_ITEM* aParent ) :
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIM_RADIAL::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -1576,6 +1587,7 @@ bool PCB_DIM_RADIAL::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 EDA_ITEM* PCB_DIM_RADIAL::Clone() const
@@ -1692,6 +1704,7 @@ PCB_DIM_CENTER::PCB_DIM_CENTER( BOARD_ITEM* aParent ) :
 }
 
 
+#ifdef KICAD_IPC_API
 void PCB_DIM_CENTER::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -1727,6 +1740,7 @@ bool PCB_DIM_CENTER::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
+#endif // KICAD_IPC_API
 
 
 EDA_ITEM* PCB_DIM_CENTER::Clone() const

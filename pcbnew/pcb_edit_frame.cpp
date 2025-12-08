@@ -61,7 +61,9 @@
 #include <pcb_painter.h>
 #include <project/project_file.h>
 #include <project/project_local_settings.h>
+#ifdef KICAD_SCRIPTING
 #include <python_scripting.h>
+#endif
 #include <settings/common_settings.h>
 #include <settings/settings_manager.h>
 #include <local_history.h>
@@ -102,7 +104,9 @@
 #include <tools/multichannel_tool.h>
 #include <router/router_tool.h>
 #include <autorouter/autoplace_tool.h>
+#ifdef KICAD_SCRIPTING
 #include <python/scripting/pcb_scripting_tool.h>
+#endif
 #include <netlist_reader/netlist_reader.h>
 #include <wx/socket.h>
 #include <wx/wupdlock.h>
@@ -134,10 +138,10 @@
 #endif
 
 #include <action_plugin.h>
+#ifdef KICAD_SCRIPTING
 #include <pcbnew_scripting_helpers.h>
+#endif
 #include <richio.h>
-
-#include "../scripting/python_scripting.h"
 
 #include <wx/filedlg.h>
 
@@ -488,9 +492,11 @@ PCB_EDIT_FRAME::PCB_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
     {
     }
 
+#ifdef KICAD_SCRIPTING
     // Ensure the Python interpreter is up to date with its environment variables
     PythonSyncEnvironmentVariables();
     PythonSyncProjectName();
+#endif
 
     // Sync action plugins in case they changed since the last time the frame opened
     GetToolManager()->RunAction( ACTIONS::pluginsReload );
@@ -686,7 +692,9 @@ void PCB_EDIT_FRAME::OnCrossProbeFlashTimer( wxTimerEvent& aEvent )
 
 PCB_EDIT_FRAME::~PCB_EDIT_FRAME()
 {
+#ifdef KICAD_SCRIPTING
     ScriptingOnDestructPcbEditFrame( this );
+#endif
 
     if( ADVANCED_CFG::GetCfg().m_ShowEventCounters )
     {
@@ -871,7 +879,9 @@ void PCB_EDIT_FRAME::setupTools()
     m_toolManager->RegisterTool( new CONVERT_TOOL );
     m_toolManager->RegisterTool( new PCB_GROUP_TOOL );
     m_toolManager->RegisterTool( new GENERATOR_TOOL );
+#ifdef KICAD_SCRIPTING
     m_toolManager->RegisterTool( new SCRIPTING_TOOL );
+#endif
     m_toolManager->RegisterTool( new PROPERTIES_TOOL );
     m_toolManager->RegisterTool( new MULTICHANNEL_TOOL );
     m_toolManager->RegisterTool( new EMBED_TOOL );
@@ -964,8 +974,10 @@ void PCB_EDIT_FRAME::setupUIConditions()
     mgr->SetConditions( PCB_ACTIONS::graphicsOutlines, CHECK( !cond.GraphicsFillDisplay() ) );
     mgr->SetConditions( PCB_ACTIONS::textOutlines,     CHECK( !cond.TextFillDisplay() ) );
 
+#ifdef KICAD_SCRIPTING
     if( SCRIPTING::IsWxAvailable() )
         mgr->SetConditions( PCB_ACTIONS::showPythonConsole, CHECK( cond.ScriptingConsoleVisible() ) );
+#endif
 
     auto enableZoneControlCondition =
             [this] ( const SELECTION& )
@@ -2195,6 +2207,7 @@ bool PCB_EDIT_FRAME::FetchNetlistFromSchematic( NETLIST& aNetlist,
 }
 
 
+#ifdef KICAD_SCRIPTING
 void PCB_EDIT_FRAME::PythonSyncEnvironmentVariables()
 {
     const ENV_VAR_MAP& vars = Pgm().GetLocalEnvVariables();
@@ -2221,6 +2234,7 @@ void PCB_EDIT_FRAME::PythonSyncProjectName()
     // regenerate it (in Unicode) for our normal environment
     wxSetEnv( PROJECT_VAR_NAME, evValue );
 }
+#endif
 
 
 void PCB_EDIT_FRAME::ShowFootprintPropertiesDialog( FOOTPRINT* aFootprint )
@@ -2935,9 +2949,11 @@ void PCB_EDIT_FRAME::CommonSettingsChanged( int aFlags )
     GetCanvas()->GetView()->MarkTargetDirty( KIGFX::TARGET_NONCACHED );
     GetCanvas()->ForceRefresh();
 
+#ifdef KICAD_SCRIPTING
     // Update the environment variables in the Python interpreter
     if( aFlags & ENVVARS_CHANGED )
         PythonSyncEnvironmentVariables();
+#endif
 
     Layout();
     SendSizeEvent();
@@ -2952,7 +2968,9 @@ void PCB_EDIT_FRAME::ThemeChanged()
 
 void PCB_EDIT_FRAME::ProjectChanged()
 {
+#ifdef KICAD_SCRIPTING
     PythonSyncProjectName();
+#endif
 
     // Register autosave history saver for the board.
     // Saver exports the in-memory BOARD into the history mirror preserving the original

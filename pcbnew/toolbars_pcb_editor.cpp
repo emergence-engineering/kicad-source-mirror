@@ -61,7 +61,9 @@
 #include <toolbars_pcb_editor.h>
 #include <settings/settings_manager.h>
 
+#ifdef KICAD_SCRIPTING
 #include "../scripting/python_scripting.h"
+#endif
 
 
 /* Data to build the layer pair indicator button */
@@ -424,7 +426,11 @@ void PCB_EDIT_FRAME::configureToolbars()
         [this]( ACTION_TOOLBAR* aToolbar )
         {
             // Add scripting console and API plugins
+#ifdef KICAD_SCRIPTING
             bool scriptingAvailable = SCRIPTING::IsWxAvailable();
+#else
+            bool scriptingAvailable = false;
+#endif
 
             #ifdef KICAD_IPC_API
             bool haveApiPlugins = Pgm().GetCommonSettings()->m_Api.enable_server &&
