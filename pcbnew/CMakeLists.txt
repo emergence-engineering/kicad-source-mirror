@@ -8,6 +8,8 @@ add_compile_definitions( PCBNEW )
 
 add_subdirectory(connectivity)
 
+add_subdirectory(navlib)
+
 add_subdirectory(router)
 
 #psnrouter depends on make_lexer outputs in common( bug #1285878 )
@@ -916,6 +918,7 @@ endif ()
 set( PCBNEW_KIFACE_LIBRARIES
     pcbnew_kiface_objects
     connectivity
+    pcbnew_navlib
     pcbcommon
     pnsrouter
     kicommon
@@ -946,8 +949,13 @@ if( EMSCRIPTEN )
         )
     # WASM: Allow multiple definitions of symbols that exist in both
     # KiCad and wxWidgets (e.g., nanosvg, wxGetContentRect)
+    # Also use --whole-archive for pcbcommon to ensure vtables/typeinfo are included
+    # Without this, wasm-ld may not pull in symbols that are only referenced via RTTI
     target_link_options( pcbnew PRIVATE
         "LINKER:--allow-multiple-definition"
+        "LINKER:--whole-archive"
+        "$<TARGET_FILE:pcbcommon>"
+        "LINKER:--no-whole-archive"
         )
 endif()
 
