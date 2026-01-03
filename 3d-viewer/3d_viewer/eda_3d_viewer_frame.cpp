@@ -197,7 +197,9 @@ EDA_3D_VIEWER_FRAME::EDA_3D_VIEWER_FRAME( KIWAY* aKiway, PCB_BASE_FRAME* aParent
 
     try
     {
-#ifdef __linux__
+#ifdef __EMSCRIPTEN__
+        // SpaceMouse not supported in WASM
+#elif defined( __linux__ )
         m_spaceMouse = std::make_unique<SPNAV_VIEWER_PLUGIN>( m_canvas );
 #else
         m_spaceMouse = std::make_unique<NL_3D_VIEWER_PLUGIN>( m_canvas );
@@ -396,8 +398,10 @@ void EDA_3D_VIEWER_FRAME::handleIconizeEvent( wxIconizeEvent& aEvent )
 {
     KIWAY_PLAYER::handleIconizeEvent( aEvent );
 
+#ifndef __EMSCRIPTEN__
     if( m_spaceMouse && aEvent.IsIconized() )
         m_spaceMouse->SetFocus( false );
+#endif
 }
 
 
@@ -520,8 +524,10 @@ void EDA_3D_VIEWER_FRAME::OnActivate( wxActivateEvent &aEvent )
         m_canvas->SetFocus();
     }
 
+#ifndef __EMSCRIPTEN__
     if( m_spaceMouse )
         m_spaceMouse->SetFocus( aEvent.GetActive() );
+#endif
 
     aEvent.Skip(); // required under wxMAC
 }

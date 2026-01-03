@@ -30,7 +30,10 @@
 #ifndef OPENGL_INCLUDES_H
 #define OPENGL_INCLUDES_H
 
-#ifdef __APPLE__
+#ifdef __EMSCRIPTEN__
+// For WASM, use kiglew.h which provides GL with our stubs and wrappers
+#include <gal/opengl/kiglew.h>
+#elif defined( __APPLE__ )
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
