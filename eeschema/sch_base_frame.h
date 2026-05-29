@@ -323,7 +323,9 @@ protected:
 private:
 
     /// These are file watchers for the symbol library tables.
+#if wxUSE_FSWATCHER
     std::unique_ptr<wxFileSystemWatcher>    m_watcher;
+#endif
     wxFileName                              m_watcherFileName;
     wxDateTime                              m_watcherLastModified;
     wxTimer                                 m_watcherDebounceTimer;

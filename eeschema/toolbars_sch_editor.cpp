@@ -32,7 +32,9 @@
 #include <bitmaps.h>
 #include <eeschema_id.h>
 #include <pgm_base.h>
+#ifdef KICAD_SCRIPTING
 #include <python_scripting.h>
+#endif
 #include <tool/tool_manager.h>
 #include <tool/action_toolbar.h>
 #include <tools/sch_actions.h>
@@ -251,7 +253,11 @@ void SCH_EDIT_FRAME::configureToolbars()
         [this]( ACTION_TOOLBAR* aToolbar )
         {
             // Add scripting console and API plugins
+            #ifdef KICAD_SCRIPTING
             bool scriptingAvailable = SCRIPTING::IsWxAvailable();
+            #else
+            bool scriptingAvailable = false;
+            #endif
 
             #ifdef KICAD_IPC_API
             bool haveApiPlugins = Pgm().GetCommonSettings()->m_Api.enable_server &&
