@@ -59,6 +59,14 @@ WX_PROGRESS_REPORTER::~WX_PROGRESS_REPORTER()
 
 bool WX_PROGRESS_REPORTER::updateUI()
 {
+#ifdef __EMSCRIPTEN__
+    // KiCad-WASM: wxProgressDialog::Update() pumps a nested event loop (wxYield).
+    // Under Asyncify that forces an unwind/rewind in the middle of a long-running
+    // operation such as loading a schematic; even with rewind working, the op is
+    // left half-done. Skip the UI pump entirely and report "not cancelled" so the
+    // work runs straight through synchronously. No progress dialog updates in wasm.
+    return true;
+#else
     int cur = CurrentProgress();
 
     if( cur < 0 || cur > 1000 )
@@ -99,6 +107,7 @@ bool WX_PROGRESS_REPORTER::updateUI()
     DrainPendingEvents();
 
     return diag;
+#endif
 }
 
 
