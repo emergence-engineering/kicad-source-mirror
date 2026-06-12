@@ -328,9 +328,16 @@ bool EDA_DRAW_PANEL_GAL::DoRePaint()
         {
             SwitchBackend( GAL_FALLBACK );
 
+#ifndef __EMSCRIPTEN__
+            // In the WASM/WebGL build the bitmap-font shader path throws on the
+            // first BeginDrawing and Cairo is the expected, unavoidable fallback
+            // (see common/gal/webgl). The info box would then pop on every
+            // preview render — and, opened over a modal chooser, it used to wedge
+            // the app. Fall back silently there; keep the notice for native.
             DisplayInfoMessage( m_parent,
                                 _( "Could not use OpenGL, falling back to software rendering" ),
                                 wxString( err.what() ) );
+#endif
 
             StartDrawing();
         }
