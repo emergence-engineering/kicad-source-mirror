@@ -67,6 +67,7 @@ public:
         SCH_EASYEDAPRO,       ///< EasyEDA Pro archive
         SCH_LTSPICE,          ///< LtSpice Schematic format
         SCH_HTTP,             ///< KiCad HTTP library
+        SCH_PCBJAM,           ///< pcbjam remote library (WASM JS bridge)
 
         // Add your schematic type here.
         SCH_FILE_UNKNOWN,
