@@ -48,6 +48,7 @@
 #include <pcb_io/easyedapro/pcb_io_easyedapro.h>
 #include <pcb_io/ipc2581/pcb_io_ipc2581.h>
 #include <pcb_io/odbpp/pcb_io_odbpp.h>
+#include <pcb_io/pcbjam_fp/pcb_io_pcbjam_fp.h>
 #include <reporter.h>
 #include <libraries/library_table_parser.h>
 
@@ -350,4 +351,12 @@ static PCB_IO_MGR::REGISTER_PLUGIN registerODBPPPlugin(
         PCB_IO_MGR::ODBPP,
         wxT( "ODB++" ),
         []() -> PCB_IO* { return new PCB_IO_ODBPP; } );
+
+// pcbjam remote footprint library (WASM JS bridge). The name string is the
+// fp-lib-table row "type" the boot-generated table uses to select this plugin
+// (PCB_IO_MGR::EnumFromStr is registry-driven, case-insensitive).
+static PCB_IO_MGR::REGISTER_PLUGIN registerPcbjamFpPlugin(
+        PCB_IO_MGR::PCBJAM_FP,
+        wxT( "PCBJAM_FP" ),
+        []() -> PCB_IO* { return new PCB_IO_PCBJAM_FP; } );
 // clang-format on

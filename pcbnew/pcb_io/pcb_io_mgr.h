@@ -70,6 +70,7 @@ public:
         SOLIDWORKS_PCB,
         IPC2581,
         ODBPP,
+        PCBJAM_FP,              ///< pcbjam remote footprint library (WASM JS bridge).
         // add your type here.
 
         // etc.
