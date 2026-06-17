@@ -44,13 +44,11 @@
 #include <mutex>
 #include <magic_enum.hpp>
 
-#ifdef KICAD_IPC_API
 #include <google/protobuf/any.pb.h>
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/api_pcb_utils.h>
 #include <api/board/board_types.pb.h>
-#endif
 
 
 ZONE::ZONE( BOARD_ITEM_CONTAINER* aParent ) :
@@ -229,7 +227,6 @@ ZONE* ZONE::Clone( PCB_LAYER_ID aLayer ) const
 }
 
 
-#ifdef KICAD_IPC_API
 void ZONE::Serialize( google::protobuf::Any& aContainer ) const
 {
     using namespace kiapi::board;
@@ -432,7 +429,6 @@ bool ZONE::Deserialize( const google::protobuf::Any& aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 bool ZONE::HigherPriority( const ZONE* aOther ) const

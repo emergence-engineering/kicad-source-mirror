@@ -32,9 +32,7 @@
 #include <string_utils.h>
 #include <i18n_utility.h>
 #include <netinfo.h>
-#ifdef KICAD_IPC_API
 #include <api/board/board_types.pb.h>
-#endif
 
 using namespace std::placeholders;
 
@@ -46,7 +44,6 @@ BOARD_CONNECTED_ITEM::BOARD_CONNECTED_ITEM( BOARD_ITEM* aParent, KICAD_T idtype 
 }
 
 
-#ifdef KICAD_IPC_API
 void BOARD_CONNECTED_ITEM::UnpackNet( const kiapi::board::types::Net& aProto )
 {
     if( BOARD* board = GetBoard() )
@@ -71,7 +68,6 @@ void BOARD_CONNECTED_ITEM::PackNet( kiapi::board::types::Net* aProto ) const
 {
     aProto->set_name( GetNetname().ToUTF8() );
 }
-#endif // KICAD_IPC_API
 
 
 bool BOARD_CONNECTED_ITEM::SetNetCode( int aNetCode, bool aNoAssert )

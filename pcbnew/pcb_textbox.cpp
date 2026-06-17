@@ -39,11 +39,9 @@
 #include <convert_basic_shapes_to_polygon.h>
 #include <macros.h>
 #include <core/ignore.h>
-#ifdef KICAD_IPC_API
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/board/board_types.pb.h>
-#endif
 
 
 PCB_TEXTBOX::PCB_TEXTBOX( BOARD_ITEM* aParent, KICAD_T aType ) :
@@ -75,7 +73,6 @@ void PCB_TEXTBOX::CopyFrom( const BOARD_ITEM* aOther )
 }
 
 
-#ifdef KICAD_IPC_API
 void PCB_TEXTBOX::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common::types;
@@ -171,7 +168,6 @@ bool PCB_TEXTBOX::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 void PCB_TEXTBOX::StyleFromSettings( const BOARD_DESIGN_SETTINGS& settings, bool aCheckSide )

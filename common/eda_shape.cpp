@@ -43,11 +43,9 @@
 #include <math/util.h>      // for KiROUND
 #include <eda_item.h>
 #include <plotters/plotter.h>
-#ifdef KICAD_IPC_API
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/common/types/base_types.pb.h>
-#endif
 
 
 EDA_SHAPE::EDA_SHAPE( SHAPE_T aType, int aLineWidth, FILL_T aFill ) :
@@ -151,7 +149,6 @@ EDA_SHAPE::EDA_SHAPE( const SHAPE& aShape ) :
 }
 
 
-#ifdef KICAD_IPC_API
 void EDA_SHAPE::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -319,7 +316,6 @@ bool EDA_SHAPE::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 wxString EDA_SHAPE::ShowShape() const

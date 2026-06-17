@@ -66,13 +66,11 @@
 #include <view/view.h>
 #include <zone.h>
 
-#ifdef KICAD_IPC_API
 #include <google/protobuf/any.pb.h>
 #include <api/board/board_types.pb.h>
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/api_pcb_utils.h>
-#endif
 
 
 FOOTPRINT::FOOTPRINT( BOARD* parent ) :
@@ -299,7 +297,6 @@ FOOTPRINT::~FOOTPRINT()
 }
 
 
-#ifdef KICAD_IPC_API
 void FOOTPRINT::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::board;
@@ -620,7 +617,6 @@ bool FOOTPRINT::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 PCB_FIELD* FOOTPRINT::GetField( FIELD_T aFieldType )

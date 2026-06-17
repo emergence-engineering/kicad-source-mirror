@@ -23,6 +23,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+#include <google/protobuf/any.pb.h>
+
 #include <advanced_config.h>
 #include <pcb_edit_frame.h>
 #include <base_units.h>
@@ -39,12 +41,9 @@
 #include <geometry/geometry_utils.h>
 #include <callback_gal.h>
 #include <convert_basic_shapes_to_polygon.h>
-#ifdef KICAD_IPC_API
-#include <google/protobuf/any.pb.h>
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/board/board_types.pb.h>
-#endif
 
 
 PCB_TEXT::PCB_TEXT( BOARD_ITEM* parent, KICAD_T idtype ) :
@@ -88,7 +87,6 @@ void PCB_TEXT::CopyFrom( const BOARD_ITEM* aOther )
 }
 
 
-#ifdef KICAD_IPC_API
 void PCB_TEXT::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -136,7 +134,6 @@ bool PCB_TEXT::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 wxString PCB_TEXT::GetShownText( bool aAllowExtraText, int aDepth ) const

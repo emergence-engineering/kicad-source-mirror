@@ -26,11 +26,8 @@
 
 #include "pcb_shape.h"
 
-#include <magic_enum.hpp>
-
-#ifdef KICAD_IPC_API
 #include <google/protobuf/any.pb.h>
-#endif
+#include <magic_enum.hpp>
 
 #include <bitmaps.h>
 #include <macros.h>
@@ -46,11 +43,9 @@
 #include <geometry/point_types.h>
 #include <geometry/shape_utils.h>
 #include <pcb_painter.h>
-#ifdef KICAD_IPC_API
 #include <api/board/board_types.pb.h>
 #include <api/api_enums.h>
 #include <api/api_utils.h>
-#endif
 
 
 PCB_SHAPE::PCB_SHAPE( BOARD_ITEM* aParent, KICAD_T aItemType, SHAPE_T aShapeType ) :
@@ -81,7 +76,6 @@ void PCB_SHAPE::CopyFrom( const BOARD_ITEM* aOther )
 }
 
 
-#ifdef KICAD_IPC_API
 void PCB_SHAPE::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -138,7 +132,6 @@ bool PCB_SHAPE::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 bool PCB_SHAPE::IsType( const std::vector<KICAD_T>& aScanTypes ) const

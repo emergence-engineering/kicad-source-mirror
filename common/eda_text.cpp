@@ -51,11 +51,9 @@
 #include <geometry/shape_poly_set.h>
 #include <properties/property_validators.h>
 #include <ctl_flags.h>
-#ifdef KICAD_IPC_API
 #include <api/api_enums.h>
 #include <api/api_utils.h>
 #include <api/common/types/base_types.pb.h>
-#endif
 
 #include <wx/debug.h>           // for wxASSERT
 #include <wx/string.h>
@@ -197,7 +195,6 @@ EDA_TEXT& EDA_TEXT::operator=( const EDA_TEXT& aText )
 }
 
 
-#ifdef KICAD_IPC_API
 void EDA_TEXT::Serialize( google::protobuf::Any &aContainer ) const
 {
     using namespace kiapi::common;
@@ -279,7 +276,6 @@ bool EDA_TEXT::Deserialize( const google::protobuf::Any &aContainer )
 
     return true;
 }
-#endif // KICAD_IPC_API
 
 
 void EDA_TEXT::SetText( const wxString& aText )
