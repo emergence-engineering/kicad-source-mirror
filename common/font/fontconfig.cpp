@@ -77,6 +77,11 @@ void fontconfig::FONTCONFIG::SetReporter( REPORTER* aReporter )
 
 /**
  * This is simply a wrapper to call FcInit() with SEH for Windows.
+ *
+ * SEH on Windows can only be used in functions without objects that might be unwound
+ * (basically objects with destructors).
+ * For example, new FONTCONFIG() in Fontconfig() is creating a object with a destructor
+ * that *might* need to be unwound. MSVC catches this and throws a compile error.
  */
 static void bootstrapFc()
 {
@@ -92,6 +97,11 @@ static void bootstrapFc()
                                                          : EXCEPTION_CONTINUE_SEARCH )
     {
         g_fcInitSuccess = false;
+
+        // We have documented cases that fontconfig while trying to cache fonts
+        // ends up using freetype to try and get font info
+        // freetype itself reads fonts through memory mapping instead of normal file APIs
+        // there are crashes reading fonts sometimes as a result that return STATUS_IN_PAGE_ERROR
     }
 #endif
 }
@@ -126,10 +136,14 @@ bool FONTCONFIG::isLanguageMatch( const wxString& aSearchLang, const wxString& a
     wxArrayString searhcLangBits;
     wxStringSplit( aSearchLang.Lower(), searhcLangBits, wxS( '-' ) );
 
+    // if either side of the comparison have only one section, then its a broad match but fine
+    // i.e. the haystack is declaring broad support or the search language is broad
     if( searhcLangBits.size() == 1 || supportedLangBits.size() == 1 )
     {
         return searhcLangBits[0] == supportedLangBits[0];
     }
+
+    // the full two part comparison should have passed the initial shortcut
 
     return false;
 }
@@ -168,7 +182,8 @@ void FONTCONFIG::getAllFamilyStrings( FONTCONFIG_PAT&                           
             fam = getFcString( aPat, FC_FAMILY, langIdx );
             aFamStringMap.insert_or_assign( famLang, fam );
         }
-    } while( langIdx++ < std::numeric_limits<int8_t>::max() );
+    } while( langIdx++ < std::numeric_limits<
+                     int8_t>::max() ); //arbitrary to avoid getting stuck for any reason
 }
 
 
@@ -188,6 +203,9 @@ std::string FONTCONFIG::getFamilyStringByLang( FONTCONFIG_PAT& aPat, const wxStr
         }
     }
 
+    // fall back to the first and maybe only available name
+    // most fonts by review don't even bother declaring more than one font family name
+    // and they don't even bother declare the language tag either, they just leave it blank
     return famStrings.begin()->second;
 }
 
@@ -201,9 +219,11 @@ FONTCONFIG::FF_RESULT FONTCONFIG::FindFont( const wxString& aFontName, wxString&
     if( !g_fcInitSuccess )
         return retval;
 
-    if( aFontName.Lower().Contains( wxS( "bold" ) )
+    // If the original font name contains any of these, then it is bold, regardless
+    // of whether we are looking for bold or not
+    if( aFontName.Lower().Contains( wxS( "bold" ) )       // also catches ultrabold
         || aFontName.Lower().Contains( wxS( "heavy" ) )
-        || aFontName.Lower().Contains( wxS( "black" ) )
+        || aFontName.Lower().Contains( wxS( "black" ) )   // also catches extrablack
         || aFontName.Lower().Contains( wxS( "thick" ) )
         || aFontName.Lower().Contains( wxS( "dark" ) ) )
     {
@@ -284,7 +304,7 @@ FONTCONFIG::FF_RESULT FONTCONFIG::FindFont( const wxString& aFontName, wxString&
                 wxString lower_style = styleStr.Lower();
 
                 if( lower_style.Contains( wxS( "thin" ) )
-                         || lower_style.Contains( wxS( "light" ) )
+                         || lower_style.Contains( wxS( "light" ) )   // catches ultra & extra light
                          || lower_style.Contains( wxS( "regular" ) )
                          || lower_style.Contains( wxS( "roman" ) )
                          || lower_style.Contains( wxS( "book" ) ) )
@@ -297,9 +317,9 @@ FONTCONFIG::FF_RESULT FONTCONFIG::FindFont( const wxString& aFontName, wxString&
                 {
                     has_bold = aBold;
                 }
-                else if( lower_style.Contains( wxS( "bold" ) )
+                else if( lower_style.Contains( wxS( "bold" ) )       // also catches ultrabold
                          || lower_style.Contains( wxS( "heavy" ) )
-                         || lower_style.Contains( wxS( "black" ) )
+                         || lower_style.Contains( wxS( "black" ) )   // also catches extrablack
                          || lower_style.Contains( wxS( "thick" ) )
                          || lower_style.Contains( wxS( "dark" ) ) )
                 {
@@ -350,6 +370,8 @@ FONTCONFIG::FF_RESULT FONTCONFIG::FindFont( const wxString& aFontName, wxString&
     {
         fontName.Replace( ':', ' ' );
 
+        // If we missed a case but the matching found the original font name, then we are
+        // not substituting
         if( fontName.CmpNoCase( qualifiedFontName ) == 0 )
             retval = FF_RESULT::FF_OK;
         else if( s_reporter )
@@ -368,6 +390,7 @@ void FONTCONFIG::ListFonts( std::vector<std::string>& aFonts, const std::string&
     if( !g_fcInitSuccess )
         return;
 
+    // be sure to cache bust if the language changed
     if( m_fontInfoCache.empty() || m_fontCacheLastLang != aDesiredLang || aForce )
     {
         FcConfig* config = FcConfigGetCurrent();
@@ -406,6 +429,13 @@ void FONTCONFIG::ListFonts( std::vector<std::string>& aFonts, const std::string&
                         getFamilyStringByLang( patHolder, From_UTF8( aDesiredLang.c_str() ) );
 
 #ifdef __WXMAC__
+                // On Mac (at least) some of the font names are in their own language.  If
+                // the OS doesn't support this language then we get a bunch of garbage names
+                // in the font menu.
+                //
+                // GTK, on the other hand, doesn't appear to support wxLocale::IsAvailable(),
+                // so we can't run these checks.
+
                 static std::map<wxString, bool> availableLanguages;
 
                 FcStrSet*  langStrSet = FcLangSetGetLangs( langSet );
@@ -415,6 +445,7 @@ void FONTCONFIG::ListFonts( std::vector<std::string>& aFonts, const std::string&
 
                 if( !langStr )
                 {
+                    // Symbol fonts (Wingdings, etc.) have no language
                     langSupported = true;
                 }
                 else while( langStr )
